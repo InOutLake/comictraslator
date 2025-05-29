@@ -1,0 +1,70 @@
+services:
+  gateway:
+    build:
+      context: ./gateway
+    ports:
+      - 8000:80
+    env_file: ./_envs/gateway.env
+
+  rabbitmq:
+    image: rabbitmq
+
+  docs:
+    build:
+      context: ./docs
+    ports:
+      - 8001:80
+    env_file: ./_envs/gateway.env
+
+  docs_db:
+    image: mongo
+    env_file: ./_envs/mongo.env
+
+  # cleaner:
+  #   build:
+  #     context: ./cleaner
+  #   ports:
+  #     - 8002:80
+  #   env_file: ./_envs/gateway.env
+
+  # translator:
+  #   build:
+  #     context: ./translator
+  #   ports:
+  #     - 8003:80
+  #   env_file: ./_envs/gateway.env
+
+  # ocr:
+  #   build:
+  #     context: ./ocr
+  #   ports:
+  #     - 8004:80
+  #   env_file: ./_envs/gateway.env
+
+  # keycloak:
+  #   image: keycloak/keycloak
+  #   env_file: ./_envs/gateway.env
+
+  # prometheus:
+  #   image: prom/prometheus
+  #   ports:
+  #     - 8081:9090
+  #   env_file: ./_envs/gateway.env
+
+  # grafana:
+  #   image: grafana/grafana
+  #   ports:
+  #     - 8082:3000
+  #   env_file: ./_envs/gateway.env
+
+  # loki:
+  #   image: grafana/loki
+  #   ports:
+  #     - 8083:3000
+  #   env_file: ./_envs/gateway.env
+
+  # promtail:
+  #   image: grafana/promtail
+  #   ports:
+  #     - 8084:3000
+  #   env_file: ./_envs/gateway.env
