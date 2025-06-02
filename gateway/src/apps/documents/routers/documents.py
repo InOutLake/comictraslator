@@ -8,6 +8,8 @@ from gateway.src.apps.documents.schemas.routers.documents import (
 )
 from fastapi import APIRouter, Depends
 
+from shared.services.s3 import S3Service, S3ServiceDep
+
 router = APIRouter(prefix="ocr")
 
 
