@@ -1,27 +1,28 @@
-from typing import Annotated, Any, List, Protocol, Self
+from typing import Annotated, Any, Coroutine, List, Protocol, Self
 
 from fastapi import Depends
 from gateway.src.apps.documents.enums import OCRActions
-from gateway.src.common.repositories.rmqrepository import RMQRPCClient
-from src.apps.documents.schemas.documents import Page
-from src.apps.documents.schemas.ocr import FindAreasResponse, GetTextResponse
-from src.common.settings import settings
+from shared.repositories.rmqrepository import RMQRPCClient
+from gateway.src.apps.documents.schemas.documents import Page
+from gateway.src.apps.documents.schemas.ocr import FindAreasResponse, GetTextResponse
+from gateway.src.common.settings import settings
 
 
 class OCRRepository(Protocol):
-    def find_areas(self: Self, pages: List[Page]): ...
-    def get_text(self: Self, page_areas: Any): ...
+    async def find_areas(self: Self, pages: Page) -> FindAreasResponse: ...
+
+    async def get_text(self: Self, page_areas: Any) -> GetTextResponse: ...
 
 
 class OCRRabbitMQRepository(OCRRepository, RMQRPCClient):
     exchange_name = "OCR"
 
-    async def find_areas(self: Self, pages: List[Page]):
+    async def find_areas(self: Self, pages: Page) -> FindAreasResponse:
         response = await self.do(OCRActions.FIND_AREAS, pages)
         return FindAreasResponse.model_validate_json(response)
 
-    async def get_text(self: Self, pages_areas: Any):
-        response = await self.do(OCRActions.GET_TEXT, pages_areas)
+    async def get_text(self: Self, page_areas: Any):
+        response = await self.do(OCRActions.GET_TEXT, page_areas)
         return GetTextResponse.model_validate_json(response)
 
 

@@ -1,0 +1,13 @@
+from pydantic import BaseModel
+
+
+class FindAreasRequest(BaseModel): ...
+
+
+class FindAreasResponse(BaseModel): ...
+
+
+class TranslatePageRequest(BaseModel): ...
+
+
+class TranslatePageResponse(BaseModel): ...
