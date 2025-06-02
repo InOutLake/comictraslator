@@ -1,6 +1,6 @@
 from enum import StrEnum, auto
 
 
-class DocumentsActionsEnum:
-    LIST_DOCUMENTS = auto()
-    READ_DOCUMENT = auto()
+class OCRActions(StrEnum):
+    FIND_AREAS = auto()
+    GET_TEXT = auto()

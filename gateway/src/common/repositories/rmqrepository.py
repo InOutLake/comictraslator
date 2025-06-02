@@ -1,6 +1,6 @@
 import asyncio
 from enum import Enum
-from typing import Self
+from typing import Any, Self
 import uuid
 
 from pydantic import BaseModel
@@ -8,7 +8,39 @@ from src.common.settings import Settings
 import aio_pika
 
 
-class RMQRPCClientjepository:
+class RMQClientBase:
+    exchange_name: str = "default"
+
+    def __init__(self: Self, settings: Settings) -> None:
+        self.settings = settings
+        self.connection: aio_pika.Connection | None = None
+        self.channel: aio_pika.Channel | None = None
+        self.callback_queue: aio_pika.Queue | None = None
+
+    async def initialize(self: Self) -> None:
+        self.connection = await aio_pika.connect_robust(
+            host=self.settings.host,
+            port=self.settings.port,
+            login=self.settings.user,
+            password=self.settings.password,
+        )
+        self.channel = await self.connection.channel()
+        exchange = await self.channel.get_exchange(self.exchange_name)
+        if not exchange:
+            await self.channel.declare_exchange(self.exchange_name)
+            exchange = await self.channel.get_exchange(self.exchange_name)
+        self.exchange = exchange
+
+
+class RMQSendClient(RMQClientBase):
+    async def send(self: Self, message: Any):
+        await self.exchange.publish(
+            aio_pika.Message(bytes(message, "utf-8")),
+            routing_key=self.exchange_name,
+        )
+
+
+class RMQRPCClient(RMQClientBase):
     """
     ### Warning!
     Initialize before usage!
@@ -29,11 +61,8 @@ class RMQRPCClientjepository:
     exchange_name: str = "default"
 
     def __init__(self: Self, settings: Settings) -> None:
-        self.settings = settings
-        self.connection: aio_pika.Connection | None = None
-        self.channel: aio_pika.Channel | None = None
-        self.callback_queue: aio_pika.Queue | None = None
         self.futures = {}
+        super().__init__(settings)
 
     async def do(
         self: Self,
@@ -55,21 +84,10 @@ class RMQRPCClientjepository:
         )
         response = await future
         self.futures.pop(correlation_id)
-        return response
+        return response.body.decode()
 
     async def initialize(self: Self) -> None:
-        self.connection = await aio_pika.connect_robust(
-            host=self.settings.host,
-            port=self.settings.port,
-            login=self.settings.user,
-            password=self.settings.password,
-        )
-        self.channel = await self.conneciton.channel()
-        exchange = await self.channel.get_exchange(self.exchange_name)
-        if not exchange:
-            await self.channel.declare_exchange(self.exchange_name)
-            exchange = await self.channel.get_exchange(self.exchange_name)
-        self.exchange = exchange
+        await super().initialize()
         self.callback_queue = await self.channel.declare_queue(exclusive=True)
         await self.callback_queue.consume(self._on_response)
 

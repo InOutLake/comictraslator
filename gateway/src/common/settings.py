@@ -1,5 +1,11 @@
-from pydantic_settings.main import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    RABBIT_CONNECTIONSTRING: str
+    RMQ_HOST: str
+    RMQ_PORT: str
+    RMQ_USER: str
+    RMQ_PASS: str
+
+
+settings = Settings(BaseSettings)
