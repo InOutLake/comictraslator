@@ -1,5 +1,5 @@
-from apps.documents.schemas.documents import Page
-from apps.documents.schemas.ocr import FindAreasResponse, GetTextResponse
+from apps.documents.schemas.services.documents import Page
+from apps.documents.schemas.services.ocr import FindAreasResponse, GetTextResponse
 from fastapi import Depends
 from gateway.src.apps.documents.repositories.ocr import (
     OCRRepository,

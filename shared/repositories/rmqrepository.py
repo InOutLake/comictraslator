@@ -32,10 +32,10 @@ class RMQClientBase:
 
 
 class RMQSendClient(RMQClientBase):
-    async def send(self: Self, message: Any):
+    async def send(self: Self, rkey: Enum, message: Any):
         await self.exchange.publish(
             aio_pika.Message(bytes(message, "utf-8")),
-            routing_key=self.exchange_name,
+            routing_key=rkey.value,
         )
 
 
@@ -46,13 +46,11 @@ class RMQRPCClient(RMQClientBase):
     ### Usage example:
     ```python
     async def read_document(self: Self, data: SomeSchema) -> Document:
-        await self.publish_message(
+        response = await self.do(
                 SomeEnum.SOMEACTION,
                 data,
                 correlation_id=correlation_id,
             )
-
-        response = await future
         return Document.model_validate_json(response)
     ```
     """
@@ -66,7 +64,7 @@ class RMQRPCClient(RMQClientBase):
 
     async def do(
         self: Self,
-        action: Enum,
+        rkey: Enum,
         data: BaseModel,
     ):
         correlation_id = str(uuid.uuid4())
@@ -75,12 +73,12 @@ class RMQRPCClient(RMQClientBase):
         await self.exchange.publish(
             aio_pika.Message(
                 body=data.model_dump_json().encode(),
-                headers={"action": action.value},
+                content_type="application/json",
+                content_encoding="utf-8",
                 reply_to=self.callback_queue.name,  # type: ignore
                 correlation_id=correlation_id,
             ),
-            # routing key meant to be the same as exchange_name for now
-            routing_key=self.exchange_name,
+            routing_key=rkey.value,
         )
         response = await future
         self.futures.pop(correlation_id)

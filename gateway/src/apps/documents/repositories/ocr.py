@@ -1,11 +1,10 @@
-from typing import Annotated, Any, Coroutine, List, Protocol, Self
-
+from typing import Annotated, Any, Protocol, Self
 from fastapi import Depends
 from gateway.src.apps.documents.enums import OCRActions
 from shared.repositories.rmqrepository import RMQRPCClient
-from gateway.src.apps.documents.schemas.documents import Page
-from gateway.src.apps.documents.schemas.ocr import FindAreasResponse, GetTextResponse
-from gateway.src.common.settings import settings
+from apps.documents.schemas.services.documents import Page
+from apps.documents.schemas.services.ocr import FindAreasResponse, GetTextResponse
+from shared.settings import settings
 
 
 class OCRRepository(Protocol):

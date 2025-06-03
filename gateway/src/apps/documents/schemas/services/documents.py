@@ -1,23 +1,18 @@
+from apps.documents.enums import Languages
 from pydantic import BaseModel
 from typing import Any, List
 
 
-# TODO language enum
 class Frame(BaseModel):
     start_cords: List[int]
     end_cords: List[int]
     text: str | None
-    text_params: Any | None
-
-
-class FrameTranslation(Frame):
-    frame: Frame | None
-    language: str
+    text_params: Any | None = None
 
 
 class Page(BaseModel):
     number: int
-    frames: List[Frame]
+    frames: List[Frame] | None = None
     original_url: str
     cleared_url: str | None
 
@@ -25,6 +20,14 @@ class Page(BaseModel):
 class PageTranlsation(BaseModel):
     page: Page
     translatioin_url: str
+    language: Languages
+
+
+class TranslatedFrame(BaseModel):
+    language: Languages
+    parent_frame: Frame | None = None
+    frame: Frame
+    page_translation: PageTranlsation
 
 
 class Document(BaseModel):
