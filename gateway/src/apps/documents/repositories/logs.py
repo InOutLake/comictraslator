@@ -11,3 +11,7 @@ class OCRRabbitMQRepository(LogsRepository, RMQSendClient):
 
     async def send_logs(self: Self, message: str):
         await self.send(message)
+
+
+async def logs_repository_factory():
+    repo = OCRRabbitMQRepository()

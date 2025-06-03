@@ -6,8 +6,9 @@ from gateway.src.apps.documents.schemas.routers.documents import (
     TranslatePageRequest,
     TranslatePageResponse,
 )
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
+from gateway.src.apps.documents.services.translation import TranslationService
 from shared.services.s3 import S3Service, S3ServiceDep
 
 router = APIRouter(prefix="ocr")

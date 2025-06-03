@@ -26,8 +26,9 @@ class OCRRabbitMQRepository(OCRRepository, RMQRPCClient):
         return GetTextResponse.model_validate_json(response)
 
 
-def ocr_repository_factory() -> OCRRepository:
+async def ocr_repository_factory() -> OCRRepository:
     repo = OCRRabbitMQRepository(settings=settings)
+    await repo.initialize()
     return repo
 
 
