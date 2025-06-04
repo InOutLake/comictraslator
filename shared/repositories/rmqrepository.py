@@ -26,7 +26,7 @@ class RMQClientBase:
         self.channel = await self.connection.channel()
         exchange = await self.channel.get_exchange(self.exchange_name)
         if not exchange:
-            await self.channel.declare_exchange(self.exchange_name)
+            await self.channel.declare_exchange(self.exchange_name, type="fanout")
             exchange = await self.channel.get_exchange(self.exchange_name)
         self.exchange = exchange
 

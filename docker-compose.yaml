@@ -2,23 +2,25 @@ services:
   gateway:
     build:
       context: ./gateway
+      dockerfile: dockerfile
     ports:
       - 8000:80
     env_file: ./_envs/gateway.env
 
   rabbitmq:
     image: rabbitmq
+    env_file: ./_envs/rabbitmq.env
 
-  docs:
-    build:
-      context: ./docs
-    ports:
-      - 8001:80
-    env_file: ./_envs/gateway.env
+  # docs:
+  #   build:
+  #     context: ./docs
+  #   ports:
+  #     - 8001:80
+  #   env_file: ./_envs/gateway.env
 
-  docs_db:
-    image: mongo
-    env_file: ./_envs/mongo.env
+  # docs_db:
+  #   image: mongo
+  #   env_file: ./_envs/mongo.env
 
   # cleaner:
   #   build:
@@ -51,20 +53,36 @@ services:
   #     - 8081:9090
   #   env_file: ./_envs/gateway.env
 
-  # grafana:
-  #   image: grafana/grafana
-  #   ports:
-  #     - 8082:3000
-  #   env_file: ./_envs/gateway.env
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    depends_on:
+      - loki
+      - promtail
 
-  # loki:
-  #   image: grafana/loki
-  #   ports:
-  #     - 8083:3000
-  #   env_file: ./_envs/gateway.env
+  loki:
+    image: grafana/loki
+    ports:
+      - 3100:3100
+    volumes:
+      - ./metrics/loki.yaml:/etc/loki/local-config.yaml
+    command: -config.expand-env -config.file=/etc/loki/local-config.yaml
 
-  # promtail:
-  #   image: grafana/promtail
-  #   ports:
-  #     - 8084:3000
-  #   env_file: ./_envs/gateway.env
+  promtail:
+    image: grafana/promtail
+    ports:
+      - '9080:9080'
+    volumes:
+      - ./metrics/promtail-config.yaml:/etc/promtail/config.yaml
+      - ./metrics/positions.yaml:/tmp/positions.yaml
+    depends_on:
+      - loki
+    command: -config.expand-env -config.file=/etc/promtail/config.yaml
+
+volumes:
+  grafana-storage:

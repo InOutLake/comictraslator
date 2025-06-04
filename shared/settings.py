@@ -12,5 +12,7 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY: str = "default"
     S3_SECRET_KEY: str = "default"
 
+    LOGS_EXCHANGE: str = "default"
+
 
 settings = Settings()
