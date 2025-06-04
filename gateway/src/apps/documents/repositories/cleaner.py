@@ -1,21 +1,21 @@
-from typing import Annotated, Any, Protocol, Self
+from typing import Annotated, Protocol, Self
 from fastapi import Depends
 from gateway.src.apps.documents.enums import CleanerActions
+from gateway.src.apps.documents.schemas.services.cleaner import CleanRequest
 from shared.repositories.rmqrepository import RMQRPCClient
-from apps.documents.schemas.services.ocr import FindAreasResponse, GetTextResponse
 from shared.settings import settings
 
 
 class CleanerRepository(Protocol):
-    async def clean(self: Self, page_url: str, fields: Any) -> str: ...
+    async def clean(self: Self, data: CleanRequest) -> str: ...
 
 
 class CleanerRabbitMQRepository(CleanerRepository, RMQRPCClient):
     exchange_name = "Cleaner"
 
-    async def clean(self: Self, data: CleanRequest) -> FindAreasResponse:
+    async def clean(self: Self, data: CleanRequest) -> str:
         response = await self.do(CleanerActions.CLEAN, data)
-        return response.decode()
+        return response
 
 
 async def ocr_repository_factory() -> CleanerRepository:

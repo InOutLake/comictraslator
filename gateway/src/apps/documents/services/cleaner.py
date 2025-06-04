@@ -1,6 +1,6 @@
 from apps.documents.schemas.services.cleaner import CleanRequest, CleanResponse
 from fastapi import Depends
-from typing import Annotated, Any, Protocol, Self
+from typing import Annotated, Protocol, Self
 from gateway.src.apps.documents.repositories.cleaner import (
     CleanerRepository,
     CleanerRepositoryDep,

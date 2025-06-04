@@ -7,7 +7,9 @@ requires-python = ">=3.12.9"
 dependencies = [
     "aio-pika>=9.5.5",
     "aioboto3>=14.3.0",
+    "aiohttp>=3.12.6",
     "fastapi>=0.115.12",
+    "pillow>=11.2.1",
     "pydantic-settings>=2.9.1",
     "python-dotenv>=1.1.0",
     "uvicorn>=0.34.2",

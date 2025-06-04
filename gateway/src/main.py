@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-import pika
+from gateway.src.apps.documents.router import router as documents_router
 import uvicorn
 
 app = FastAPI()
-connection = pika.BlockingConnection()
+app.include_router(documents_router)
 
 
 @app.get("/healthcheck")

@@ -1,4 +1,8 @@
 from typing import Annotated
+from gateway.src.apps.documents.services.cleaner import (
+    CleanerService,
+    CleanerServiceDep,
+)
 from gateway.src.apps.documents.services.ocr import OCRService, OCRServiceDep
 from apps.documents.schemas.router import (
     FindAreasRequest,
